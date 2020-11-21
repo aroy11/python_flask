@@ -11,3 +11,7 @@ class Customer:
     def get_customer_details(self, customer_id):
         self.logger.info('Inside get details method')
         return self.db_client.get_record('userName', customer_id)
+
+    def update_account_detail(self, account_data):
+        self.logger.info('Updating account detail')
+        return self.db_client.update_record(account_data)

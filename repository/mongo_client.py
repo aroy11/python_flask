@@ -1,5 +1,6 @@
 import json
 from bson import json_util
+from flask import jsonify
 
 from pymongo import MongoClient
 
@@ -24,7 +25,12 @@ class MongoRepository(AbstractRepository):
         pass
 
     def update_record(self, request_data):
-        pass
+        account = self.collection.find_one({'_id': request_data.record_identifier_value})
+        if not account:
+            return jsonify({"error": "Login failed"}), 401
+
+        x = self.collection.update_one({'_id': request_data.record_identifier_value}, request_data)
+        return x.upserted_id
 
     def add_record(self, request_data):
         pass
