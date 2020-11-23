@@ -3,18 +3,18 @@ import abc
 
 class AbstractRepository(abc.ABC):
 
-    @abc.abstractmethod
-    def add_record(self, request_data):
+    @classmethod
+    def add_record(cls, request_data, collection_name):
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def update_record(self, request_data):
+    @classmethod
+    def update_record(cls, request_data):
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def get_record(self, record_identifier, record_identifier_value):
+    @classmethod
+    def get_record(cls, record_identifier, record_identifier_value):
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def delete_record(self, request_data):
+    @classmethod
+    def delete_record(cls, request_data):
         raise NotImplementedError
