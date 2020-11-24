@@ -21,7 +21,7 @@ class MongoRepository(AbstractRepository):
 
     def get_record(self, record_identifier, record_identifier_value):
         if record_identifier_value:
-            data = self.collection.find({record_identifier: int(record_identifier_value)}, {"_id": 0})
+            data = self.collection.find({record_identifier: record_identifier_value}, {"_id": 0})
         else:
             data = self.collection.find({}, {"_id": 0})
         records = dict(data=[])

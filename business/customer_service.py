@@ -10,6 +10,10 @@ class Customer:
         self.mongo_repository = MongoRepository('mongodb://localhost:27017', 'banking', 'accounts')
         self.logger = log_helper('INFO')
 
+    def get_customer_details(self, customer_id):
+        self.logger.info('Inside get details method')
+        return self.mongo_repository.get_record('userName', customer_id)
+
     def update_account_detail(self):
         self.logger.info('Updating account detail')
         return self.mongo_repository.update_record(self.request_data)
@@ -47,7 +51,7 @@ class Customer:
     def get_loan_details(self):
         self.logger.info('Inside get loan details')
         try:
-            loan_data = self.mongo_repository.get_record("LoanId", self.request_data)
+            loan_data = self.mongo_repository.get_record("LoanId", int(self.request_data))
             if loan_data and len(loan_data["data"]) > 0:
                 response = make_response(loan_data, 200)
             else:

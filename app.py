@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request, make_response
-# from flask_bcrypt import Bcrypt
 import jwt
 from flask_jsonschema_validator import JSONSchemaValidator
 from jsonschema import ValidationError
@@ -55,18 +54,20 @@ def login():
             {'WWW-Authenticate': 'Login required'}
         )
 
-    user = Customer.get_customer_details(auth.get('username'))
+    customer = Customer('Test')
+    user = customer.get_customer_details(auth.get('username'))
+    userInfo = user.get('data')[0]
 
-    if not user:
+    if not userInfo:
         return make_response(
             'Could not verify',
             403,
             {'WWW-Authenticate': 'Invalid credentials'}
         )
 
-    if check_password_hash(user.get('password'), auth.get('password')):
+    if check_password_hash(userInfo.get('password'), auth.get('password')):
         token = jwt.encode({
-            'name': user.get('userName'),
+            'name': userInfo.get('userName'),
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
