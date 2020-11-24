@@ -2,6 +2,9 @@ import abc
 
 
 class AbstractRepository(abc.ABC):
+    @classmethod
+    def get_account_number(cls):
+        raise NotImplementedError
 
     @classmethod
     def add_record(cls, request_data, collection_name):

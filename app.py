@@ -24,6 +24,20 @@ def get_customer_detail():
     return customer.get_customer_details('rrajeevan')
 
 
+@app.route('/register', methods=["POST"])
+def register_customer():
+    data = request.json
+    customer = Customer(data)
+    return customer.add_customer()
+
+
+@app.route('/loan/<loan_id>', methods=["GET"])
+def loan_detail(loan_id):
+    # loan_id = request.args.get("loan_id", None)
+    customer = Customer(loan_id)
+    return customer.get_loan_details()
+
+
 @app.route('/update', methods=['POST'])
 def update_account_detail():
     data = request.json
