@@ -30,12 +30,12 @@ class Customer:
         _id = None
         acc_no: int = 0
         try:
-            self.request_data["AccountNumber"] = self.mongo_repository.get_account_number() + 1
-            self.request_data["Password"] = generate_password_hash(self.request_data["Password"])
+            self.request_data["accountNumber"] = self.mongo_repository.get_account_number() + 1
+            self.request_data["password"] = generate_password_hash(self.request_data["password"])
             _id = self.mongo_repository.add_record(self.request_data)
             if _id:
-                acc_no = self.request_data["AccountNumber"]
-                response = make_response(jsonify({"AccountNumber": acc_no}), 200)
+                acc_no = self.request_data["accountNumber"]
+                response = make_response(jsonify({"accountNumber": acc_no}), 200)
                 response.headers["trace_id"] = _id
             else:
                 response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
