@@ -1,13 +1,10 @@
 from flask import Flask, jsonify, request, make_response
-
-import jwt
-
 from flask_jsonschema_validator import JSONSchemaValidator
 from jsonschema import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from business.customer_service import Customer
+import jwt
 from datetime import datetime, timedelta
+from business.customer_service import Customer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xec]/'  # TO DO - read from config file
@@ -34,16 +31,18 @@ def register_customer():
 
 @app.route('/loan/<loan_id>', methods=["GET"])
 def loan_detail(loan_id):
-    return Customer.get_loan_details(loan_id)
+    customer = Customer(loan_id)
+    return customer.get_loan_details()
 
 
-@app.route('/update', methods=['POST'])
+@app.route('/customer', methods=['POST'])
 def update_account_detail():
     data = request.json
-    return Customer.update_account_detail(data)
+    customer = Customer(data)
+    return customer.update_account_detail()
 
 
-@app.route('/delete/<customer_id>', methods=['DELETE'])
+@app.route('/customer/<customer_id>', methods=['DELETE'])
 def delete_customer(customer_id):
     delete_response = Customer.delete_customer(customer_id)
     if int(delete_response) == 0:
@@ -94,7 +93,8 @@ def login():
 @app.validate('loan', 'add')  # file name, schema name
 def add_loan_details():
     data = request.json
-    return Customer.add_loan_details(data)
+    customer = Customer(data)
+    return customer.add_loan_details()
 
 
 if __name__ == '__main__':

@@ -11,15 +11,19 @@ class MongoRepository(AbstractRepository):
         self.collection = self.db[collection_name]
         self.logger = log_helper('INFO')
 
-    def get_account_number(self):
+    def get_document_number(self, document_id, collection_name=None):
         try:
-            acc_number = self.collection.find().sort("accountNumber", pymongo.DESCENDING).limit(1)[0]["accountNumber"]
+            if collection_name:
+                self.collection = self.db[collection_name]
+            doc_id = self.collection.find().sort(document_id, pymongo.DESCENDING).limit(1)[0][document_id]
         except BaseException as ex:
-            acc_number = 1000
+            doc_id = 1000
             self.logger.info(ex)
-        return acc_number
+        return doc_id
 
-    def get_record(self, record_identifier, record_identifier_value, collection_name=None):
+    def get_record(self, record_identifier, record_identifier_value=None, collection_name=None):
+        if collection_name:
+            self.collection = self.db[collection_name]
         if record_identifier_value:
             data = self.collection.find({record_identifier: record_identifier_value}, {"_id": 0})
         else:
@@ -29,14 +33,16 @@ class MongoRepository(AbstractRepository):
             records["data"].append(item)
         return records
 
-    def delete_record(self, record_identifier, record_identifier_value, collection_name=None):
+    def delete_record(self, record_identifier, record_identifier_value=None, collection_name=None):
         response = self.collection.delete_one({record_identifier: record_identifier_value})
         return str(response.deleted_count)
 
     def add_record(self, request_data, collection_name=None):
+        if collection_name:
+            self.collection = self.db[collection_name]
         response = self.collection.insert_one(request_data)
         self.logger.info(response.inserted_id)
         return response.inserted_id
 
-    def update_record(self, request_data):
+    def update_record(self, request_data, collection_name=None):
         pass
