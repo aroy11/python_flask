@@ -13,7 +13,7 @@ class MongoRepository(AbstractRepository):
     @classmethod
     def get_account_number(cls):
         try:
-            acc_number = cls.collection.find().sort("AccountNumber", pymongo.DESCENDING).limit(1)[0]["AccountNumber"]
+            acc_number = cls.collection.find().sort("accountNumber", pymongo.DESCENDING).limit(1)[0]["accountNumber"]
         except BaseException as ex:
             acc_number = 1000
             cls.logger.info(ex)
