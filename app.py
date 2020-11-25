@@ -26,7 +26,8 @@ def get_customer_detail():
 @app.route('/register', methods=["POST"])
 def register_customer():
     data = request.json
-    return Customer.add_customer(data)
+    customer = Customer(data)
+    return customer.add_customer()
 
 
 @app.route('/loan/<loan_id>', methods=["GET"])
