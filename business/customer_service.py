@@ -10,9 +10,21 @@ class Customer:
         self.mongo_repository = MongoRepository('mongodb://localhost:27017', 'banking', 'accounts')
         self.logger = log_helper('INFO')
 
-    def get_customer_details(self, customer_id):
+    def get_customer_details(self, search_condition, customer_identifier):
         self.logger.info('Inside get details method')
-        return self.mongo_repository.get_record('userName', customer_id)
+        try:
+            if customer_identifier is None:
+                return make_response(jsonify({"message": "Invalid search condition"}), 400)
+            else:
+                data = self.mongo_repository.get_record(search_condition, customer_identifier)
+                if len(data) > 0:
+                    #data["data"][0].pop("password")
+                    return data
+                return make_response(jsonify({"message": "No records found"}), 200)
+        except Exception as e:
+            self.logger.error(e)
+            raise e
+
 
     def delete_customer(self, customer_id):
         self.logger.info('Inside delete details method')
@@ -47,7 +59,7 @@ class Customer:
                 response.headers["trace_id"] = _id
             else:
                 response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
-        except BaseException as ex:
+        except Exception as ex:
             self.logger.error(repr(ex))
             response = make_response(jsonify({"Error": "Error occurred on customer creation"}), 500)
         return response
@@ -60,7 +72,7 @@ class Customer:
                 response = make_response(loan_data, 200)
             else:
                 response = make_response(jsonify({"Info": "Loan details not found"}), 201)
-        except BaseException as ex:
+        except Exception as ex:
             self.logger.error(repr(ex))
             response = make_response(jsonify({"Error": "Error occurred while fetching loan details"}), 500)
         return response

@@ -19,9 +19,10 @@ def on_validation_error(e):
     return make_response(jsonify({"error": str(e)}), 400)
 
 
-@app.route('/', methods=['GET'])
-def get_customer_detail():
-    return Customer.get_customer_details('rrajeevan')
+@app.route('/customer/<int:customer_id>', methods=['GET'])
+def get_customer_detail(customer_id):
+    customer = Customer(customer_id)
+    return customer.get_customer_details('accountNumber', customer_id)
 
 
 @app.route('/register', methods=["POST"])
@@ -60,8 +61,8 @@ def login():
             401,
             {'WWW-Authenticate': 'Login required'}
         )
-
-    user = Customer.get_customer_details(auth.get('username'))
+    customer = Customer(auth)
+    user = customer.get_customer_details('username', auth.get('username'))
     if not user.get('data') == []:
         userInfo = user.get('data')[0]
     else:
