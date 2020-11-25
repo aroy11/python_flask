@@ -20,6 +20,15 @@ class MongoRepository(AbstractRepository):
         return acc_number
 
     @classmethod
+    def get_loan_id(cls):
+        try:
+            acc_number = cls.collection.find().sort("loanID", pymongo.DESCENDING).limit(1)[0]["loanID"]
+        except BaseException as ex:
+            loan_id = 1000
+            cls.logger.info(ex)
+        return loan_id
+
+    @classmethod
     def get_record(cls, record_identifier, record_identifier_value):
         if record_identifier_value:
             data = cls.collection.find({record_identifier: record_identifier_value}, {"_id": 0})

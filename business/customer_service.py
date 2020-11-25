@@ -25,11 +25,12 @@ class Customer:
     @classmethod
     def add_loan_details(cls, request_data):
         cls.logger.info('Inside add loan details method')
+        request_data["loanID"] = MongoRepository.get_loan_id() + 1
         _id, user_name, error_msg = MongoRepository.add_record(request_data, "loan")
         if error_msg:
             response = make_response(jsonify({"error": f"Error Adding Customer data - {error_msg}"}), 500)
         else:
-            response = make_response(jsonify({"username": user_name}), 200)
+            response = make_response(jsonify({"username": user_name, "loanID": request_data["loanID"]}), 200)
             response.headers["trace_id"] = _id
         return response
 
