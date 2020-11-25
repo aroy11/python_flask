@@ -27,8 +27,12 @@ class Customer:
             raise e
 
     def delete_customer(self, customer_id):
-        self.logger.info('Inside delete details method')
-        return self.mongo_repository.delete_record('userName', customer_id)
+        self.logger.info('Inside delete customer details method')
+        return self.mongo_repository.delete_record('accountNumber', customer_id)
+
+    def delete_loan(self, loan_id):
+        self.logger.info('Inside delete loan details method')
+        return self.mongo_repository.delete_record('loanID', loan_id)
 
     def update_account_detail(self):
         self.logger.info('Updating account detail')
