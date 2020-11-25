@@ -57,7 +57,7 @@ class Customer:
     def get_loan_details(cls, request_data):
         cls.logger.info('Inside get loan details')
         try:
-            loan_data = MongoRepository.get_record("LoanId", int(cls.request_data))
+            loan_data = MongoRepository.get_record("LoanId", int(request_data))
             if loan_data and len(loan_data["data"]) > 0:
                 response = make_response(loan_data, 200)
             else:
