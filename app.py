@@ -50,7 +50,7 @@ def delete_customer(customer_id):
 
 @app.route('/login', methods=['POST'])
 def login():
-    auth = request.form
+    auth = request.json
     if not auth or not auth.get('username') or not auth.get('password'):
         return make_response(
             'Could not verify',

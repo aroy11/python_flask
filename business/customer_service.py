@@ -10,12 +10,12 @@ class Customer:
     @classmethod
     def get_customer_details(cls, customer_id):
         cls.logger.info('Inside get details method')
-        return MongoRepository.get_record('userName', customer_id)
+        return MongoRepository.get_record('username', customer_id)
 
     @classmethod
     def delete_customer(cls, customer_id):
         cls.logger.info('Inside delete details method')
-        return MongoRepository.delete_record('userName', customer_id)
+        return MongoRepository.delete_record('username', customer_id)
 
     @classmethod
     def update_account_detail(cls, request_data):
