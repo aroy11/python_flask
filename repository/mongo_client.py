@@ -41,9 +41,9 @@ class MongoRepository(AbstractRepository):
         error_msg = None
         try:
             if collection_name:
-                cls.coll = cls.db[collection_name]
+                cls.collection = cls.db[collection_name]
             # request_data["user_name"] = cls.generate_user_name()
-            doc = cls.coll.insert_one(request_data)
+            doc = cls.collection.insert_one(request_data)
             _id, user_name = str(doc.inserted_id), request_data["username"]
         except BaseException as e:
             cls.logger.info(repr(e))
