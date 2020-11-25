@@ -11,22 +11,13 @@ class MongoRepository(AbstractRepository):
     logger = log_helper('INFO')
 
     @classmethod
-    def get_account_number(cls):
+    def get_document_id(cls, document_id):
         try:
-            acc_number = cls.collection.find().sort("accountNumber", pymongo.DESCENDING).limit(1)[0]["accountNumber"]
+            doc_id = cls.collection.find().sort(document_id, pymongo.DESCENDING).limit(1)[0][document_id]
         except BaseException as ex:
-            acc_number = 1000
+            doc_id = 1000
             cls.logger.info(ex)
-        return acc_number
-
-    @classmethod
-    def get_loan_id(cls):
-        try:
-            acc_number = cls.collection.find().sort("loanID", pymongo.DESCENDING).limit(1)[0]["loanID"]
-        except BaseException as ex:
-            loan_id = 1000
-            cls.logger.info(ex)
-        return loan_id
+        return doc_id
 
     @classmethod
     def get_record(cls, record_identifier, record_identifier_value):

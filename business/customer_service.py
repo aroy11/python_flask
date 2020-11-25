@@ -25,7 +25,7 @@ class Customer:
     @classmethod
     def add_loan_details(cls, request_data):
         cls.logger.info('Inside add loan details method')
-        request_data["loanID"] = MongoRepository.get_loan_id() + 1
+        request_data["loanID"] = MongoRepository.get_document_id("loanID") + 1
         _id, user_name, error_msg = MongoRepository.add_record(request_data, "loan")
         if error_msg:
             response = make_response(jsonify({"error": f"Error Adding Customer data - {error_msg}"}), 500)
@@ -40,7 +40,7 @@ class Customer:
         _id = None
         acc_no: int = 0
         try:
-            request_data["accountNumber"] = MongoRepository.get_account_number() + 1
+            request_data["accountNumber"] = MongoRepository.get_document_id("accountNumber") + 1
             request_data["password"] = generate_password_hash(request_data["password"])
             _id = MongoRepository.add_record(request_data)
             if _id:
@@ -58,7 +58,7 @@ class Customer:
     def get_loan_details(cls, request_data):
         cls.logger.info('Inside get loan details')
         try:
-            loan_data = MongoRepository.get_record("LoanId", int(request_data))
+            loan_data = MongoRepository.get_record("loanID", int(request_data))
             if loan_data and len(loan_data["data"]) > 0:
                 response = make_response(loan_data, 200)
             else:

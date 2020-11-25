@@ -14,7 +14,6 @@ JSONSchemaValidator(app=app, root="schemas")  # folder
 
 @app.errorhandler(ValidationError)
 def on_validation_error(e):
-    # return Response("There was a validation error: " + str(e), 400)
     return make_response(jsonify({"error": str(e)}), 400)
 
 
@@ -31,8 +30,7 @@ def register_customer():
 
 @app.route('/loan/<loan_id>', methods=["GET"])
 def loan_detail(loan_id):
-    # loan_id = request.args.get("loan_id", None)
-    return Customer.get_loan_details()
+    return Customer.get_loan_details(loan_id)
 
 
 @app.route('/update', methods=['POST'])
