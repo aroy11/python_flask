@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, make_response
+
 import jwt
+
 from flask_jsonschema_validator import JSONSchemaValidator
 from jsonschema import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -74,7 +76,7 @@ def login():
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token': token.decode('UTF-8')}), 201)
+        return make_response(jsonify({'token': token}), 201)
     else:
         return make_response(
             'Could not verify',
