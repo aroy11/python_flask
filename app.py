@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, make_response
+
 import jwt
+
 from flask_jsonschema_validator import JSONSchemaValidator
 from jsonschema import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,7 +16,6 @@ JSONSchemaValidator(app=app, root="schemas")  # folder
 
 @app.errorhandler(ValidationError)
 def on_validation_error(e):
-    # return Response("There was a validation error: " + str(e), 400)
     return make_response(jsonify({"error": str(e)}), 400)
 
 
@@ -32,8 +33,7 @@ def register_customer():
 
 @app.route('/loan/<loan_id>', methods=["GET"])
 def loan_detail(loan_id):
-    # loan_id = request.args.get("loan_id", None)
-    return Customer.get_loan_details()
+    return Customer.get_loan_details(loan_id)
 
 
 @app.route('/update', methods=['POST'])
@@ -53,7 +53,7 @@ def delete_customer(customer_id):
 
 @app.route('/login', methods=['POST'])
 def login():
-    auth = request.form
+    auth = request.json
     if not auth or not auth.get('username') or not auth.get('password'):
         return make_response(
             'Could not verify',
@@ -62,7 +62,10 @@ def login():
         )
 
     user = Customer.get_customer_details(auth.get('username'))
-    userInfo = user.get('data')[0]
+    if not user.get('data') == []:
+        userInfo = user.get('data')[0]
+    else:
+        userInfo = None
 
     if not userInfo:
         return make_response(
@@ -73,11 +76,11 @@ def login():
 
     if check_password_hash(userInfo.get('password'), auth.get('password')):
         token = jwt.encode({
-            'name': userInfo.get('userName'),
+            'name': userInfo.get('username'),
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token': token.decode('UTF-8')}), 201)
+        return make_response(jsonify({'token': token}), 201)
     else:
         return make_response(
             'Could not verify',
