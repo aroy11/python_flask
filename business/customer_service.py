@@ -14,6 +14,10 @@ class Customer:
         self.logger.info('Inside get details method')
         return self.mongo_repository.get_record('userName', customer_id)
 
+    def delete_customer(self, customer_id):
+        self.logger.info('Inside delete details method')
+        return self.mongo_repository.delete_record('userName', customer_id)
+
     def update_account_detail(self):
         self.logger.info('Updating account detail')
         return self.mongo_repository.update_record(self.request_data)

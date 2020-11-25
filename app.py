@@ -43,6 +43,14 @@ def update_account_detail():
     data = request.json
     return Customer.update_account_detail(data)
 
+@app.route('/delete/<customer_id>', methods=['DELETE'])
+def delete_customer(customer_id):
+    customer = Customer('Test')
+    delete_response = customer.delete_customer(customer_id)
+    if int(delete_response) == 0:
+        return make_response('Could not delete: User not found', 404)
+    elif int(delete_response):
+        return make_response('Deleted', 200)
 
 @app.route('/login', methods=['POST'])
 def login():

@@ -29,9 +29,9 @@ class MongoRepository(AbstractRepository):
             records["data"].append(item)
         return records
 
-    @classmethod
-    def delete_record(cls, request_data):
-        pass
+    def delete_record(self, record_identifier, record_identifier_value):
+        response = self.collection.delete_one({record_identifier: record_identifier_value})
+        return str(response.deleted_count)
 
     def add_record(self, request_data):
         response = self.collection.insert_one(request_data)
