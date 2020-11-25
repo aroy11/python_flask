@@ -5,38 +5,51 @@ from util.logging_util import log_helper
 
 
 class MongoRepository(AbstractRepository):
-    def __init__(self, host_uri, database_name, collection_name):
-        self.client = MongoClient(host_uri)
-        self.db = self.client[database_name]
-        self.collection = self.db[collection_name]
-        self.logger = log_helper('INFO')
+    mc = MongoClient("mongodb://localhost:27017")
+    db = mc["banking"]
+    collection = db["users"]
+    logger = log_helper('INFO')
 
-    def get_account_number(self):
+    @classmethod
+    def get_account_number(cls):
         try:
-            acc_number = self.collection.find().sort("AccountNumber", pymongo.DESCENDING).limit(1)[0]["AccountNumber"]
+            acc_number = cls.collection.find().sort("AccountNumber", pymongo.DESCENDING).limit(1)[0]["AccountNumber"]
         except BaseException as ex:
             acc_number = 1000
-            self.logger.info(ex)
+            cls.logger.info(ex)
         return acc_number
 
-    def get_record(self, record_identifier, record_identifier_value):
+    @classmethod
+    def get_record(cls, record_identifier, record_identifier_value):
         if record_identifier_value:
-            data = self.collection.find({record_identifier: record_identifier_value}, {"_id": 0})
+            data = cls.collection.find({record_identifier: record_identifier_value}, {"_id": 0})
         else:
-            data = self.collection.find({}, {"_id": 0})
+            data = cls.collection.find({}, {"_id": 0})
         records = dict(data=[])
         for item in data:
             records["data"].append(item)
         return records
 
-    def delete_record(self, record_identifier, record_identifier_value):
-        response = self.collection.delete_one({record_identifier: record_identifier_value})
+    @classmethod
+    def delete_record(cls, record_identifier, record_identifier_value):
+        response = cls.collection.delete_one({record_identifier: record_identifier_value})
         return str(response.deleted_count)
 
-    def add_record(self, request_data):
-        response = self.collection.insert_one(request_data)
-        self.logger.info(response.inserted_id)
-        return response.inserted_id
+    @classmethod
+    def add_record(cls, request_data, collection_name=None):
+        _id = user_name = 0
+        error_msg = None
+        try:
+            if collection_name:
+                cls.coll = cls.db[collection_name]
+            # request_data["user_name"] = cls.generate_user_name()
+            doc = cls.coll.insert_one(request_data)
+            _id, user_name = str(doc.inserted_id), request_data["username"]
+        except BaseException as e:
+            cls.logger.info(repr(e))
+            error_msg = repr(e)
+        return _id, user_name, error_msg
 
-    def update_record(self, request_data):
+    @classmethod
+    def update_record(cls, request_data):
         pass

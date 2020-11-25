@@ -2,16 +2,13 @@ import abc
 
 
 class AbstractRepository(abc.ABC):
+
     @classmethod
-    def get_account_number(cls):
+    def add_record(cls, request_data, table_name):
         raise NotImplementedError
 
     @classmethod
-    def add_record(cls, request_data, collection_name):
-        raise NotImplementedError
-
-    @classmethod
-    def update_record(cls, request_data):
+    def update_record(cls, request_data, table_name):
         raise NotImplementedError
 
     @classmethod

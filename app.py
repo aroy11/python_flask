@@ -20,22 +20,19 @@ def on_validation_error(e):
 
 @app.route('/', methods=['GET'])
 def get_customer_detail():
-    customer = Customer('Test')
-    return customer.get_customer_details('rrajeevan')
+    return Customer.get_customer_details('rrajeevan')
 
 
 @app.route('/register', methods=["POST"])
 def register_customer():
     data = request.json
-    customer = Customer(data)
-    return customer.add_customer()
+    return Customer.add_customer(data)
 
 
 @app.route('/loan/<loan_id>', methods=["GET"])
 def loan_detail(loan_id):
     # loan_id = request.args.get("loan_id", None)
-    customer = Customer(loan_id)
-    return customer.get_loan_details()
+    return Customer.get_loan_details()
 
 
 @app.route('/update', methods=['POST'])
@@ -45,8 +42,7 @@ def update_account_detail():
 
 @app.route('/delete/<customer_id>', methods=['DELETE'])
 def delete_customer(customer_id):
-    customer = Customer('Test')
-    delete_response = customer.delete_customer(customer_id)
+    delete_response = Customer.delete_customer(customer_id)
     if int(delete_response) == 0:
         return make_response('Could not delete: User not found', 404)
     elif int(delete_response):
@@ -62,8 +58,7 @@ def login():
             {'WWW-Authenticate': 'Login required'}
         )
 
-    customer = Customer('Test')
-    user = customer.get_customer_details(auth.get('username'))
+    user = Customer.get_customer_details(auth.get('username'))
     userInfo = user.get('data')[0]
 
     if not userInfo:
@@ -91,7 +86,8 @@ def login():
 @app.route('/loan', methods=['POST'])
 @app.validate('loan', 'add')  # file name, schema name
 def add_loan_details():
-    return Customer.add_loan_details(request)
+    data = request.json
+    return Customer.add_loan_details(data)
 
 
 if __name__ == '__main__':
