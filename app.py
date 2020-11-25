@@ -61,7 +61,10 @@ def login():
         )
 
     user = Customer.get_customer_details(auth.get('username'))
-    userInfo = user.get('data')[0]
+    if not user.get('data') == []:
+        userInfo = user.get('data')[0]
+    else:
+        userInfo = None
 
     if not userInfo:
         return make_response(
@@ -72,7 +75,7 @@ def login():
 
     if check_password_hash(userInfo.get('password'), auth.get('password')):
         token = jwt.encode({
-            'name': userInfo.get('userName'),
+            'name': userInfo.get('username'),
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
