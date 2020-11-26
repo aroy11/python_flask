@@ -2,19 +2,34 @@
   "add": {
     "type": "object",
     "properties": {
-      "username": {
+      "loanType": {
         "type": "string",
-        "minLength": 4,
-        "maxLength": 4
+        "maxLength": 10
       },
-      "loan": {
+      "loanAmount": {
+        "type": "decimal",
+        "maxLength": 6
+      },
+      "Date": {
         "type": "string",
-        "minLength": 4,
-        "maxLength": 4
-      }},
+        "description": "Supported formats: [MM.DD.YYYY] or [MM-DD-YYYY]",
+        "pattern": "(0[1-9]|1[012])[-.](0[1-9]|[12][0-9]|3[01])[-.](19|20)[0-9]{2}"
+      },
+      "interestRate": {
+        "type": "decimal",
+        "maxLength": 6
+      },
+      "duration": {
+        "type": "int",
+        "maxLength": 2
+      }
+    },
     "required": [
-      "username",
-      "loan"
+      "loanType",
+      "loanAmount",
+      "Date",
+      "interestRate",
+      "duration"
     ]
   }
 }
