@@ -44,5 +44,11 @@ class MongoRepository(AbstractRepository):
         self.logger.info(response.inserted_id)
         return response.inserted_id
 
-    def update_record(self, request_data, collection_name=None):
-        pass
+    def update_record(self, data_for_update, query=None, collection_name=None):
+        if collection_name:
+            self.collection = self.db[collection_name]
+        if query is None:
+            response = self.collection.update_many({}, {"$set": data_for_update})
+        else:
+            response = self.collection.update_one(query, {"$set": data_for_update})
+        return response

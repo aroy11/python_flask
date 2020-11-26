@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 
+
 class Customer:
     def __init__(self, request_data):
         self.request_data = request_data
@@ -56,7 +57,6 @@ class Customer:
             else:
                 data = self.mongo_repository.get_record(search_condition, customer_identifier)
                 if len(data) > 0:
-                    # data["data"][0].pop("password")
                     return data
                 return make_response(jsonify({"message": "No records found"}), 200)
         except Exception as e:
@@ -73,7 +73,14 @@ class Customer:
 
     def update_account_detail(self):
         self.logger.info('Updating account detail')
-        return self.mongo_repository.update_record(self.request_data)
+        customer_data = self.mongo_repository.get_record('accountNumber', self.request_data['accountNumber'])
+        if len(customer_data['data']) > 0:
+            query = {'accountNumber': self.request_data['accountNumber']}
+            response = self.mongo_repository.update_record(self.request_data, query)
+            updated_records = response.modified_count
+            return jsonify({"message": f"{updated_records} records updated"})
+        else:
+            return make_response(jsonify({"message": "No such account exists. Please register"}), 200)
 
     def add_loan_details(self):
         self.logger.info('Inside add loan details method')

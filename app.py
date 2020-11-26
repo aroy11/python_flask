@@ -27,7 +27,7 @@ def token_required(f):
 
         try:
             jwt.decode(token, app.config['SECRET_KEY'])
-        except:
+        except Exception:
             return jsonify({
                 'message': 'Token is invalid.'
             }), 401
@@ -51,8 +51,10 @@ def login():
     customer = Customer(auth)
     return customer.login(auth)
 
-@app.route('/customer', methods=['POST'])
+
+@app.route('/customer', methods=['PUT'])
 @token_required
+@app.validate('customer', 'update')
 def update_account_detail():
     data = request.json
     customer = Customer(data)
@@ -78,7 +80,7 @@ def delete_customer(customer_id):
 
 
 @app.route('/loan', methods=['POST'])
-@app.validate('loan', 'add')  # file name, schema name
+@app.validate('loan', 'add')
 @token_required
 def add_loan_details():
     data = request.json
