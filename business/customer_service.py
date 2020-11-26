@@ -1,8 +1,9 @@
-from flask import make_response, jsonify
+from flask import make_response, jsonify, current_app
 from repository.mongo_client import MongoRepository
 from util.logging_util import log_helper
-from werkzeug.security import generate_password_hash
-
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from datetime import datetime, timedelta
 
 class Customer:
     def __init__(self, request_data):
@@ -10,6 +11,42 @@ class Customer:
         self.mongo_repository = MongoRepository('mongodb://localhost:27017', 'banking', 'accounts')
         self.logger = log_helper('INFO')
         self.loan_collection = "loans"
+
+    def login(self, auth):
+        login_error_message = 'Could not verify'
+        if not auth or not auth.get('username') or not auth.get('password'):
+            return make_response(
+                login_error_message,
+                401,
+                {'WWW-Authenticate': 'Login required'}
+            )
+        user = self.get_customer_details('username', auth.get('username'))
+        if not user.get('data') == []:
+            user_info = user.get('data')[0]
+        else:
+            user_info = None
+
+        if not user_info:
+            return make_response(
+                login_error_message,
+                403,
+                {'WWW-Authenticate': 'Invalid credentials'}
+            )
+
+        if check_password_hash(user_info.get('password'), auth.get('password')):
+            token = jwt.encode({
+                'name': user_info.get('username'),
+                'accountNumber': user_info.get('accountNumber'),
+                'exp': datetime.utcnow() + timedelta(minutes=30)
+            }, current_app.config['SECRET_KEY']).decode('ascii')
+
+            return make_response(jsonify({'token': token}), 201)
+        else:
+            return make_response(
+                login_error_message,
+                403,
+                {'WWW-Authenticate': 'Invalid credentials'}
+            )
 
     def get_customer_details(self, search_condition, customer_identifier):
         self.logger.info('Inside get details method')
