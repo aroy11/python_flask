@@ -49,7 +49,7 @@ def register_customer():
 def login():
     auth = request.json
     customer = Customer(auth)
-    return customer.login(auth)
+    return customer.login()
 
 
 @app.route('/customer', methods=['PUT'])

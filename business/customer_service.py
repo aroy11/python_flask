@@ -13,7 +13,8 @@ class Customer:
         self.logger = log_helper('INFO')
         self.loan_collection = "loans"
 
-    def login(self, auth):
+    def login(self):
+        auth = self.request_data
         login_error_message = 'Could not verify'
         if not auth or not auth.get('username') or not auth.get('password'):
             return make_response(

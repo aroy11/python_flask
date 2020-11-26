@@ -65,6 +65,8 @@
       "password",
       "address",
       "state",
+      "country",
+      "emailAddress",
       "pan",
       "contactNo",
       "dob",
