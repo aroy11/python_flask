@@ -52,7 +52,7 @@ def login():
     return customer.login()
 
 
-@app.route('/customer', methods=['POST'])
+@app.route('/customer', methods=['PUT'])
 @token_required
 def update_account_detail():
     data = request.json
