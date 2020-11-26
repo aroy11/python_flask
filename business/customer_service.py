@@ -64,17 +64,17 @@ class Customer:
             self.logger.error(e)
             raise e
 
-    def delete_customer(self, customer_id):
+    def delete_customer(self):
         self.logger.info('Inside delete customer details method')
-        return self.mongo_repository.delete_record('accountNumber', customer_id)
+        return self.mongo_repository.delete_record('accountNumber', int(self.request_data['accountNumber']))
 
-    def delete_loan(self, loan_id):
+    def delete_loan(self):
         self.logger.info('Inside delete loan details method')
-        return self.mongo_repository.delete_record('loanID', loan_id)
+        return self.mongo_repository.delete_record('loanID', int(self.request_data['loanID']), self.loan_collection)
 
     def update_account_detail(self):
         self.logger.info('Updating account detail')
-        customer_data = self.mongo_repository.get_record('accountNumber', self.request_data['accountNumber'])
+        customer_data = self.mongo_repository.get_record('accountNumber', int(self.request_data['accountNumber']))
         if len(customer_data['data']) > 0:
             query = {'accountNumber': self.request_data['accountNumber']}
             response = self.mongo_repository.update_record(self.request_data, query)
@@ -125,7 +125,7 @@ class Customer:
     def get_loan_details(self):
         self.logger.info('Inside get loan details')
         try:
-            loan_data = self.mongo_repository.get_record("loanID", int(self.request_data), self.loan_collection)
+            loan_data = self.mongo_repository.get_record("loanID", int(self.request_data["loanID"]), self.loan_collection)
             if loan_data and len(loan_data["data"]) > 0:
                 response = make_response(loan_data, 200)
             else:

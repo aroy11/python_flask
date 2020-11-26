@@ -27,7 +27,7 @@ def token_required(f):
 
         try:
             jwt.decode(token, app.config['SECRET_KEY'])
-        except Exception:
+        except:
             return jsonify({
                 'message': 'Token is invalid.'
             }), 401
@@ -52,9 +52,8 @@ def login():
     return customer.login()
 
 
-@app.route('/customer', methods=['PUT'])
+@app.route('/customer', methods=['POST'])
 @token_required
-@app.validate('customer', 'update')
 def update_account_detail():
     data = request.json
     customer = Customer(data)
@@ -68,11 +67,12 @@ def get_customer_detail(customer_id):
     return customer.get_customer_details('accountNumber', customer_id)
 
 
-@app.route('/customer/<int:customer_id>', methods=['DELETE'])
+@app.route('/customer', methods=['DELETE'])
 @token_required
-def delete_customer(customer_id):
-    customer = Customer(customer_id)
-    delete_response = customer.delete_customer(customer_id)
+def delete_customer():
+    data = request.json
+    customer = Customer(data)
+    delete_response = customer.delete_customer()
     if int(delete_response) == 0:
         return make_response('Could not delete: User not found', 404)
     elif int(delete_response):
@@ -80,7 +80,7 @@ def delete_customer(customer_id):
 
 
 @app.route('/loan', methods=['POST'])
-@app.validate('loan', 'add')
+@app.validate('loan', 'add')  # file name, schema name
 @token_required
 def add_loan_details():
     data = request.json
@@ -88,20 +88,22 @@ def add_loan_details():
     return customer.add_loan_details()
 
 
-@app.route('/loan/<loan_id>', methods=["GET"])
+@app.route('/loan', methods=["GET"])
 @token_required
-def loan_detail(loan_id):
-    customer = Customer(loan_id)
+def loan_detail():
+    data = request.json
+    customer = Customer(data)
     return customer.get_loan_details()
 
 
-@app.route('/loan/<loan_id>', methods=['DELETE'])
+@app.route('/loan', methods=['DELETE'])
 @token_required
-def delete_loan(loan_id):
-    customer = Customer(loan_id)
-    delete_response = customer.delete_customer(loan_id)
+def delete_loan():
+    data = request.json
+    customer = Customer(data)
+    delete_response = customer.delete_loan()
     if int(delete_response) == 0:
-        return make_response('Could not delete: User not found', 404)
+        return make_response('Could not delete: Loan details not found', 404)
     elif int(delete_response):
         return make_response('Deleted', 200)
 

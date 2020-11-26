@@ -34,6 +34,8 @@ class MongoRepository(AbstractRepository):
         return records
 
     def delete_record(self, record_identifier, record_identifier_value=None, collection_name=None):
+        if collection_name:
+            self.collection = self.db[collection_name]
         response = self.collection.delete_one({record_identifier: record_identifier_value})
         return str(response.deleted_count)
 
