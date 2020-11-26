@@ -15,6 +15,7 @@ JSONSchemaValidator(app=app, root="schemas")  # folder
 def on_validation_error(e):
     return make_response(jsonify({"error": str(e)}), 400)
 
+
 def token_required(f):
     def decorated(*args, **kwargs):
         token = None
@@ -23,7 +24,7 @@ def token_required(f):
         if not token:
             return jsonify({
                 'message': 'Token is missing.'
-                }), 401
+            }), 401
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
@@ -32,6 +33,7 @@ def token_required(f):
                 'message': 'Token is invalid.'
             }), 401
         return f(*args, **kwargs)
+
     decorated.__name__ = f.__name__
     return decorated
 
@@ -44,6 +46,7 @@ def get_customer_detail(customer_id):
 
 
 @app.route('/register', methods=["POST"])
+@app.validate('customer', 'add')  # file name, schema name
 def register_customer():
     data = request.json
     customer = Customer(data)
@@ -56,12 +59,14 @@ def loan_detail(loan_id):
     customer = Customer(loan_id)
     return customer.get_loan_details()
 
+
 @app.route('/customer', methods=['POST'])
 @token_required
 def update_account_detail():
     data = request.json
     customer = Customer(data)
     return customer.update_account_detail()
+
 
 @app.route('/customer/<int:customer_id>', methods=['DELETE'])
 @token_required
@@ -73,6 +78,7 @@ def delete_customer(customer_id):
     elif int(delete_response):
         return make_response('Deleted', 200)
 
+
 @app.route('/loan/<loan_id>', methods=['DELETE'])
 @token_required
 def delete_loan(loan_id):
@@ -82,6 +88,7 @@ def delete_loan(loan_id):
         return make_response('Could not delete: User not found', 404)
     elif int(delete_response):
         return make_response('Deleted', 200)
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -120,6 +127,7 @@ def login():
             403,
             {'WWW-Authenticate': 'Invalid credentials'}
         )
+
 
 @app.route('/loan', methods=['POST'])
 @app.validate('loan', 'add')  # file name, schema name

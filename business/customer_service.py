@@ -59,15 +59,19 @@ class Customer:
         _id = None
         acc_no: int = 0
         try:
-            self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
-            self.request_data["password"] = generate_password_hash(self.request_data["password"])
-            _id = self.mongo_repository.add_record(self.request_data)
-            if _id:
-                acc_no = self.request_data["accountNumber"]
-                response = make_response(jsonify({"accountNumber": acc_no}), 200)
-                response.headers["trace_id"] = _id
+            customer = self.get_customer_details("username", self.request_data["username"])
+            if customer and customer.get('data') == []:
+                self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
+                self.request_data["password"] = generate_password_hash(self.request_data["password"])
+                _id = self.mongo_repository.add_record(self.request_data)
+                if _id:
+                    acc_no = self.request_data["accountNumber"]
+                    response = make_response(jsonify({"accountNumber": acc_no}), 200)
+                    response.headers["trace_id"] = _id
+                else:
+                    response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
             else:
-                response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
+                response = make_response('User already exists. Please Log in', 202)
         except Exception as ex:
             self.logger.error(repr(ex))
             response = make_response(jsonify({"Error": "Error occurred on customer creation"}), 500)
