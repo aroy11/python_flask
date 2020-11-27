@@ -107,7 +107,7 @@ def customers():
 @app.route('/loan', methods=['POST'])
 @app.validate('loan', 'add')  # file name, schema name
 @token_required
-def add_loan_details():
+def add_loan_detail():
     data = request.json
     customer = Customer(data)
     return customer.add_loan_details()
@@ -115,7 +115,7 @@ def add_loan_details():
 
 @app.route('/loan/<int:loan_id>', methods=['GET'])
 @token_required
-def loan_detail(loan_id):
+def get_loan_detail(loan_id):
     customer = Customer(loan_id)
     return customer.get_loan_details(loan_id)
 

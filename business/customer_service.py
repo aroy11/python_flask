@@ -50,6 +50,40 @@ class Customer:
                 {'WWW-Authenticate': 'Invalid credentials'}
             )
 
+    def add_customer(self):
+        self.logger.info('Inside add customer')
+        _id = None
+        acc_no: int = 0
+        try:
+            customer = self.get_customer_details("username", self.request_data["username"])
+            if customer and customer.get('data') == []:
+                self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
+                self.request_data["password"] = generate_password_hash(self.request_data["password"])
+                _id = self.mongo_repository.add_record(self.request_data)
+                if _id:
+                    acc_no = self.request_data["accountNumber"]
+                    response = make_response(jsonify({"accountNumber": acc_no}), 200)
+                    response.headers["trace_id"] = _id
+                else:
+                    response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
+            else:
+                response = make_response('User already exists. Please Log in', 202)
+        except Exception as ex:
+            self.logger.error(repr(ex))
+            response = make_response(jsonify({"Error": "Error occurred on customer creation"}), 500)
+        return response
+
+    def update_account_detail(self):
+        self.logger.info('Updating account detail')
+        customer_data = self.mongo_repository.get_record('accountNumber', int(self.request_data['accountNumber']))
+        if len(customer_data['data']) > 0:
+            query = {'accountNumber': self.request_data['accountNumber']}
+            response = self.mongo_repository.update_record(self.request_data, query)
+            updated_records = response.modified_count
+            return jsonify({"message": f"{updated_records} records updated"})
+        else:
+            return make_response(jsonify({"message": "No such account exists. Please register"}), 200)
+
     def get_customer_details_for_account_number(self, search_condition, customer_identifier):
         response = self.get_customer_details(search_condition, customer_identifier)
         if len(response['data']) > 0:
@@ -76,21 +110,6 @@ class Customer:
         self.logger.info('Inside delete customer details method')
         return self.mongo_repository.delete_record('accountNumber', int(self.request_data['accountNumber']))
 
-    def delete_loan(self):
-        self.logger.info('Inside delete loan details method')
-        return self.mongo_repository.delete_record('loanID', int(self.request_data['loanID']), self.loan_collection)
-
-    def update_account_detail(self):
-        self.logger.info('Updating account detail')
-        customer_data = self.mongo_repository.get_record('accountNumber', int(self.request_data['accountNumber']))
-        if len(customer_data['data']) > 0:
-            query = {'accountNumber': self.request_data['accountNumber']}
-            response = self.mongo_repository.update_record(self.request_data, query)
-            updated_records = response.modified_count
-            return jsonify({"message": f"{updated_records} records updated"})
-        else:
-            return make_response(jsonify({"message": "No such account exists. Please register"}), 200)
-
     def add_loan_details(self):
         self.logger.info('Inside add loan details method')
         try:
@@ -111,29 +130,6 @@ class Customer:
             response = make_response(jsonify({"Error": "Error Adding loan data"}), 500)
         return response
 
-    def add_customer(self):
-        self.logger.info('Inside add customer')
-        _id = None
-        acc_no: int = 0
-        try:
-            customer = self.get_customer_details("username", self.request_data["username"])
-            if customer and customer.get('data') == []:
-                self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
-                self.request_data["password"] = generate_password_hash(self.request_data["password"])
-                _id = self.mongo_repository.add_record(self.request_data)
-                if _id:
-                    acc_no = self.request_data["accountNumber"]
-                    response = make_response(jsonify({"accountNumber": acc_no}), 200)
-                    response.headers["trace_id"] = _id
-                else:
-                    response = make_response(jsonify({"Warning": "Could not create customer"}), 201)
-            else:
-                response = make_response('User already exists. Please Log in', 202)
-        except Exception as ex:
-            self.logger.error(repr(ex))
-            response = make_response(jsonify({"Error": "Error occurred on customer creation"}), 500)
-        return response
-
     def get_loan_details(self, loan_id):
         self.logger.info('Inside get loan details')
         try:
@@ -146,3 +142,7 @@ class Customer:
             self.logger.error(repr(ex))
             response = make_response(jsonify({"Error": "Error occurred while fetching loan details"}), 500)
         return response
+
+    def delete_loan(self):
+        self.logger.info('Inside delete loan details method')
+        return self.mongo_repository.delete_record('loanID', int(self.request_data['loanID']), self.loan_collection)
