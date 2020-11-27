@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, jsonify, request, make_response
 from flask_jsonschema_validator import JSONSchemaValidator
 from jsonschema import ValidationError
@@ -78,6 +79,27 @@ def delete_customer():
         return make_response('Could not delete: User not found', 404)
     elif int(delete_response):
         return make_response('Deleted', 200)
+
+
+@app.route('/customers', methods=['GET', 'DELETE', 'PUT'])
+@token_required
+def customers():
+    if flask.request.method == 'GET':
+        customer = Customer(flask.request.args.get('accountNumber'))
+        print(flask.request.args.get('accountNumber'))
+        return customer.get_customer_details('accountNumber', int(flask.request.args.get('accountNumber')))
+    elif flask.request.method == 'DELETE':
+        data = request.json
+        customer = Customer(data)
+        delete_response = customer.delete_customer()
+        if int(delete_response) == 0:
+            return make_response('Could not delete: User not found', 404)
+        elif int(delete_response):
+            return make_response('Deleted', 200)
+    elif flask.request.method == 'PUT':
+        data = request.json
+        customer = Customer(data)
+        return customer.update_account_detail()
 
 
 @app.route('/loan', methods=['POST'])
