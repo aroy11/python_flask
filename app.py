@@ -54,6 +54,7 @@ def login():
 
 @app.route('/customer', methods=['PUT'])
 @token_required
+@app.validate('customer', 'update')
 def update_account_detail():
     data = request.json
     customer = Customer(data)
@@ -64,7 +65,7 @@ def update_account_detail():
 @token_required
 def get_customer_detail(customer_id):
     customer = Customer(customer_id)
-    return customer.get_customer_details('accountNumber', customer_id)
+    return customer.get_customer_details_for_account_number('accountNumber', customer_id)
 
 
 @app.route('/customer', methods=['DELETE'])

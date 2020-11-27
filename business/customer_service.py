@@ -50,6 +50,12 @@ class Customer:
                 {'WWW-Authenticate': 'Invalid credentials'}
             )
 
+    def get_customer_details_for_account_number(self, search_condition, customer_identifier):
+        response = self.get_customer_details(search_condition, customer_identifier)
+        if len(response['data']) > 0:
+            return response['data'][0]
+        return make_response(jsonify({"message": "No records found"}), 200)
+
     def get_customer_details(self, search_condition, customer_identifier):
         self.logger.info('Inside get details method')
         try:
@@ -57,9 +63,7 @@ class Customer:
                 return make_response(jsonify({"message": "Invalid search condition"}), 400)
             else:
                 data = self.mongo_repository.get_record(search_condition, customer_identifier)
-                if len(data) > 0:
-                    return data
-                return make_response(jsonify({"message": "No records found"}), 200)
+                return data
         except Exception as e:
             self.logger.error(e)
             raise e
