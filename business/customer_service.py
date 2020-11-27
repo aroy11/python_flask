@@ -56,7 +56,7 @@ class Customer:
             return response['data'][0]
         return make_response(jsonify({"message": "No records found"}), 200)
 
-    def get_customer_details(self, search_condition, customer_identifier):
+    def get_customer_details(self, search_condition, customer_identifier, is_return_Message=False):
         self.logger.info('Inside get details method')
         try:
             if customer_identifier is None:
@@ -65,7 +65,8 @@ class Customer:
                 data = self.mongo_repository.get_record(search_condition, customer_identifier)
                 if any(data.values()):
                     return data
-                return make_response(jsonify({"message": "No records found"}), 200)
+                if is_return_Message:
+                    return make_response(jsonify({"message": "No records found"}), 200)
                 return data
         except Exception as e:
             self.logger.error(e)
@@ -116,7 +117,7 @@ class Customer:
         acc_no: int = 0
         try:
             customer = self.get_customer_details("username", self.request_data["username"])
-            if customer: # and customer.get('data') == []:
+            if customer and customer.get('data') == []:
                 self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
                 self.request_data["password"] = generate_password_hash(self.request_data["password"])
                 _id = self.mongo_repository.add_record(self.request_data)
