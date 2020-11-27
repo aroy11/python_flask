@@ -109,7 +109,7 @@ class Customer:
         acc_no: int = 0
         try:
             customer = self.get_customer_details("username", self.request_data["username"])
-            if customer and customer.get('data') == []:
+            if customer: # and customer.get('data') == []:
                 self.request_data["accountNumber"] = self.mongo_repository.get_document_number("accountNumber") + 1
                 self.request_data["password"] = generate_password_hash(self.request_data["password"])
                 _id = self.mongo_repository.add_record(self.request_data)
