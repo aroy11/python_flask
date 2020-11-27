@@ -57,7 +57,7 @@ class Customer:
                 return make_response(jsonify({"message": "Invalid search condition"}), 400)
             else:
                 data = self.mongo_repository.get_record(search_condition, customer_identifier)
-                if len(data) > 0:
+                if any(data.values()):
                     return data
                 return make_response(jsonify({"message": "No records found"}), 200)
         except Exception as e:
