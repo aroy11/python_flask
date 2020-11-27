@@ -5,7 +5,7 @@ from jsonschema import ValidationError
 import jwt
 
 from business.customer_service import Customer
-# from util.schema_validator import validate_customer_json
+from util.schema_validator import validate_customer_json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xec]/'  # TO DO - read from config file
@@ -99,7 +99,7 @@ def customers():
             return make_response('Deleted', 200)
     elif flask.request.method == 'PUT':
         data = request.json
-        # if validate_customer_json(data):
+        validate_customer_json(data)
         customer = Customer(data)
         return customer.update_account_detail()
 
