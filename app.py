@@ -27,7 +27,7 @@ def token_required(f):
 
         try:
             jwt.decode(token, app.config['SECRET_KEY'])
-        except:
+        except Exception:
             return jsonify({
                 'message': 'Token is invalid.'
             }), 401
