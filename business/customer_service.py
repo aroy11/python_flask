@@ -56,7 +56,7 @@ class Customer:
             return response['data'][0]
         return make_response(jsonify({"message": "No records found"}), 200)
 
-    def get_customer_details(self, search_condition, customer_identifier, is_return_Message=False):
+    def get_customer_details(self, search_condition, customer_identifier, is_return_message=False):
         self.logger.info('Inside get details method')
         try:
             if customer_identifier is None:
@@ -65,7 +65,7 @@ class Customer:
                 data = self.mongo_repository.get_record(search_condition, customer_identifier)
                 if any(data.values()):
                     return data
-                if is_return_Message:
+                if is_return_message:
                     return make_response(jsonify({"message": "No records found"}), 200)
                 return data
         except Exception as e:
