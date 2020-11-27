@@ -37,7 +37,7 @@ def token_required(f):
     return decorated
 
 
-@app.route('/register', methods=["POST"])
+@app.route('/register', methods=['POST'])
 @app.validate('customer', 'add')  # file name, schema name
 def register_customer():
     data = request.json
@@ -88,11 +88,10 @@ def add_loan_details():
     return customer.add_loan_details()
 
 
-@app.route('/loan', methods=["GET"])
+@app.route('/loan/<int:loan_id>', methods=['GET'])
 @token_required
-def loan_detail():
-    data = request.json
-    customer = Customer(data)
+def loan_detail(loan_id):
+    customer = Customer(loan_id)
     return customer.get_loan_details()
 
 
