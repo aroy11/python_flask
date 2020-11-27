@@ -5,6 +5,7 @@ Test Comment added by Adarsh
 Payload -- Loan 
 
 {
+"username": "test",
 "loanType": "Personal",
 "loanAmount": 100000, 
 "Date": "11.11.2020",

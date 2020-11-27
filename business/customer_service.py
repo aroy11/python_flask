@@ -87,13 +87,17 @@ class Customer:
         self.logger.info('Inside add loan details method')
         try:
             data = self.request_data
-            self.request_data["loanID"] = self.mongo_repository.get_document_number("loanID", self.loan_collection) + 1
-            _id = self.mongo_repository.add_record(data, self.loan_collection)
-            if _id:
-                response = make_response(jsonify({"loanID": self.request_data["loanID"]}), 200)
-                response.headers["trace_id"] = _id
+            customer = self.get_customer_details("username", self.request_data["username"])
+            if customer and customer.get('data') != []:
+                self.request_data["loanID"] = self.mongo_repository.get_document_number("loanID", self.loan_collection) + 1
+                _id = self.mongo_repository.add_record(data, self.loan_collection)
+                if _id:
+                    response = make_response(jsonify({"loanID": self.request_data["loanID"]}), 200)
+                    response.headers["trace_id"] = _id
+                else:
+                    response = make_response(jsonify({"error": f"Error Adding loan data "}), 500)
             else:
-                response = make_response(jsonify({"error": f"Error Adding loan data "}), 500)
+                response = make_response(jsonify({"error": f"User does not exist "}), 500)
         except Exception as ex:
             self.logger.error(repr(ex))
             response = make_response(jsonify({"Error": "Error Adding loan data"}), 500)
@@ -122,10 +126,10 @@ class Customer:
             response = make_response(jsonify({"Error": "Error occurred on customer creation"}), 500)
         return response
 
-    def get_loan_details(self):
+    def get_loan_details(self, loan_id):
         self.logger.info('Inside get loan details')
         try:
-            loan_data = self.mongo_repository.get_record("loanID", int(self.request_data["loanID"]), self.loan_collection)
+            loan_data = self.mongo_repository.get_record("loanID", loan_id, self.loan_collection)
             if loan_data and len(loan_data["data"]) > 0:
                 response = make_response(loan_data, 200)
             else:

@@ -92,7 +92,7 @@ def add_loan_details():
 @token_required
 def loan_detail(loan_id):
     customer = Customer(loan_id)
-    return customer.get_loan_details()
+    return customer.get_loan_details(loan_id)
 
 
 @app.route('/loan', methods=['DELETE'])
