@@ -69,6 +69,49 @@ customer_schema = {
     ]
 }
 
+loan_schema = {
+    "type": "object",
+    "properties": {
+       "username": {
+        "type": "string",
+        "minLength": 4,
+        "maxLength": 15
+      },
+      "loanType": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "loanAmount": {
+        "type": "number",
+        "maxLength": 6
+      },
+      "Date": {
+        "type": "string",
+        "description": "Supported formats: [MM.DD.YYYY] or [MM-DD-YYYY]",
+        "pattern": "(0[1-9]|1[012])[-.](0[1-9]|[12][0-9]|3[01])[-.](19|20)[0-9]{2}"
+      },
+      "interestRate": {
+        "type": "number",
+        "maxLength": 6
+      },
+      "duration": {
+        "type": "integer",
+        "maxLength": 2
+      }
+    },
+    "required": [
+      "username",
+      "loanType",
+      "loanAmount",
+      "Date",
+      "interestRate",
+      "duration"
+    ]
+}
 
-def validate_customer_json(request):
-    validate(instance=request, schema=customer_schema)
+
+def validate_json(request, schema_type):
+    if schema_type == 1:
+        validate(instance=request, schema=customer_schema)
+    elif schema_type == 2:
+        validate(instance=request, schema=loan_schema)

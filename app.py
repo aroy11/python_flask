@@ -5,7 +5,7 @@ from jsonschema import ValidationError
 import jwt
 
 from business.customer_service import Customer
-from util.schema_validator import validate_customer_json
+from util.schema_validator import validate_json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xec]/'  # TO DO - read from config file
@@ -99,7 +99,7 @@ def customers():
             return make_response('Deleted', 200)
     elif flask.request.method == 'PUT':
         data = request.json
-        validate_customer_json(data)
+        validate_json(data, 1)
         customer = Customer(data)
         return customer.update_account_detail()
 
@@ -130,6 +130,27 @@ def delete_loan():
         return make_response('Could not delete: Loan details not found', 404)
     elif int(delete_response):
         return make_response('Deleted', 200)
+
+
+@app.route('/loans', methods=['GET', 'DELETE', 'POST'])
+@token_required
+def loans():
+    if flask.request.method == 'GET':
+        customer = Customer(flask.request.args.get('loan_id'))
+        return customer.get_loan_details(int(flask.request.args.get('loan_id')))
+    elif flask.request.method == 'DELETE':
+        data = request.json
+        customer = Customer(data)
+        delete_response = customer.delete_loan()
+        if int(delete_response) == 0:
+            return make_response('Could not delete: Loan details not found', 404)
+        elif int(delete_response):
+            return make_response('Deleted', 200)
+    elif flask.request.method == 'POST':
+        data = request.json
+        validate_json(data, 2)
+        customer = Customer(data)
+        return customer.add_loan_details()
 
 
 if __name__ == '__main__':
