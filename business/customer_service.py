@@ -78,17 +78,13 @@ class Customer:
         customer_data = self.mongo_repository.get_record('accountNumber', int(self.request_data['accountNumber']))
         if len(customer_data['data']) > 0:
             query = {'accountNumber': self.request_data['accountNumber']}
+            if 'password' in self.request_data:
+                self.request_data["password"] = generate_password_hash(self.request_data["password"])
             response = self.mongo_repository.update_record(self.request_data, query)
             updated_records = response.modified_count
             return jsonify({"message": f"{updated_records} records updated"})
         else:
             return make_response(jsonify({"message": "No such account exists. Please register"}), 200)
-
-    def get_customer_details_for_account_number(self, search_condition, customer_identifier):
-        response = self.get_customer_details(search_condition, customer_identifier)
-        if len(response['data']) > 0:
-            return response['data'][0]
-        return make_response(jsonify({"message": "No records found"}), 200)
 
     def get_customer_details(self, search_condition, customer_identifier, is_return_message=False):
         self.logger.info('Inside get details method')

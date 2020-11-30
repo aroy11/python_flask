@@ -37,6 +37,17 @@ Payload -- Add Customer
     "emailAddress": "test@tt.co"
 }
 
+Payload -- Update Customer
+
+{
+    "username": "johndoe123",
+    "contactNo": "1234567890",
+    "accountNumber": 1003,
+    "dob": "10-14-2020",
+    "password": "Blue123"
+
+}
+
 Payload -- Loan 
 
 {
