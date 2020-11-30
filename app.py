@@ -88,7 +88,7 @@ def customers():
     if flask.request.method == 'GET':
         customer = Customer(flask.request.args.get('accountNumber'))
         print(flask.request.args.get('accountNumber'))
-        return customer.get_customer_details('accountNumber', int(flask.request.args.get('accountNumber')))
+        return customer.get_customer_details_for_account_number('accountNumber', int(flask.request.args.get('accountNumber')))
     elif flask.request.method == 'DELETE':
         data = request.json
         customer = Customer(data)
