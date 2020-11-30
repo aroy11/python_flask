@@ -108,7 +108,12 @@ class Customer:
 
     def delete_customer(self):
         self.logger.info('Inside delete customer details method')
-        return self.mongo_repository.delete_record('accountNumber', int(self.request_data['accountNumber']))
+        try:
+            response = self.mongo_repository.delete_record('accountNumber',int(self.request_data['accountNumber']))
+        except Exception as ex:
+            self.logger.error(repr(ex))
+            response = make_response(jsonify({"Error": "Error deleting customer"}), 500)
+        return response
 
     def add_loan_details(self):
         self.logger.info('Inside add loan details method')
