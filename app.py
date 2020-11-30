@@ -58,8 +58,10 @@ def login():
 @token_required
 def customers():
     if flask.request.method == 'GET':
-        customer = Customer(flask.request.args.get('accountNumber'))
-        print(flask.request.args.get('accountNumber'))
+        if flask.request.args.get('accountNumber'):
+            customer = Customer(flask.request.args.get('accountNumber'))
+        else:
+            return make_response('accountNumber is required', 404)
         return customer.get_customer_details('accountNumber', int(flask.request.args.get('accountNumber')), True)
     elif flask.request.method == 'DELETE':
         data = request.json
@@ -80,8 +82,11 @@ def customers():
 @token_required
 def loans():
     if flask.request.method == 'GET':
-        customer = Customer(flask.request.args.get('loan_id'))
-        return customer.get_loan_details(int(flask.request.args.get('loan_id')))
+        if flask.request.args.get('loanID'):
+            customer = Customer(flask.request.args.get('loanID'))
+        else:
+            return make_response('LoanID is required', 404)
+        return customer.get_loan_details(int(flask.request.args.get('loanID')))
     elif flask.request.method == 'DELETE':
         data = request.json
         customer = Customer(data)
