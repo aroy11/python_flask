@@ -16,7 +16,7 @@ class MongoRepository(AbstractRepository):
             if collection_name:
                 self.collection = self.db[collection_name]
             doc_id = self.collection.find().sort(document_id, pymongo.DESCENDING).limit(1)[0][document_id]
-        except BaseException as ex:
+        except Exception as ex:
             doc_id = 1000
             self.logger.info(ex)
         return doc_id

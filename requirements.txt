@@ -14,3 +14,4 @@ pymongo==3.11.1
 pyrsistent==0.17.3
 six==1.15.0
 Werkzeug==1.0.1
+pytest~=6.2.1
