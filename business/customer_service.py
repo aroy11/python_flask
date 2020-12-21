@@ -23,7 +23,7 @@ class Customer:
                 {'WWW-Authenticate': 'Login required'}
             )
         user = self.get_customer_details('username', auth.get('username'))
-        if not user.get('data') == []:
+        if user and not user.get('data') == []:
             user_info = user.get('data')[0]
         else:
             user_info = None
