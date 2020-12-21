@@ -51,5 +51,6 @@ def test_get_loan_details_missing_identifier(test_client, test_token):
 def test_get_loan_details_no_record_found(test_client, test_token):
     url_path = '/loan?loanID=2020'
     get_response = test_client.get(url_path, headers={'Authorization': test_token})
-    assert get_response.status_code == 200
-    assert json.loads(get_response.data)['message'] == 'No records found'
+    assert get_response.status_code == 201
+    assert json.loads(get_response.data)['Info'] == 'Loan details not found'
+

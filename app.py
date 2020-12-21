@@ -40,9 +40,10 @@ def token_required(f):
 
 
 @app.route('/register', methods=['POST'])
-@app.validate('customer', 'add')  # file name, schema name
+# @app.validate('customer', 'add')  # file name, schema name
 def register_customer():
     data = request.json
+    validate_json(data, 3)
     customer = Customer(data)
     return customer.add_customer()
 

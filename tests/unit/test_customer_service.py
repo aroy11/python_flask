@@ -1,5 +1,6 @@
 import pytest
 from flask import Flask
+
 from business import customer_service
 
 
@@ -9,6 +10,10 @@ class MockGetResponse:
         return [{'UserName': 'jhonnyone',
                  'password': 'pbkdf2:sha256:150000$DBlDG8RX$b54055d6fefb40a2272c73ff7add04af9dcd332e880e3d4519848c37e754d0de',
                  'FirstName': 'John', 'accountNumber': 1001}]
+
+    @staticmethod
+    def get(data):
+        return []
 
 
 class MockGetCustomerResponse:
@@ -32,6 +37,11 @@ class MockGetEmptyResponse:
 
 
 class MockGetLoanResponse:
+    def __init__(self):
+        self.data = [{'username': 'ken45',
+                 'loanID': 1001,
+                 'loanType': 'VL', 'loanAmount': 20000}]
+
     @staticmethod
     def values():
         return [{'username': 'ken45',
@@ -52,8 +62,16 @@ class TestCustomerService:
         def mock_get(*args, **kwargs):
             return MockGetResponse()
 
+        def mock_add(*args, **kwargs):
+            return MockMongoInsertResponse()
+
+        def mock_get_doc_number(*args, **kwargs):
+            return 1000
+
         customer = customer_service.Customer(1001)
         monkeypatch.setattr(customer.mongo_repository, "get_record", mock_get)
+        monkeypatch.setattr(customer.mongo_repository, "get_document_number", mock_get_doc_number)
+        monkeypatch.setattr(customer.mongo_repository, "add_record", mock_add)
         return customer
 
     @pytest.fixture
@@ -95,34 +113,43 @@ class TestCustomerService:
     @pytest.fixture
     def return_valid_loan_response(self, monkeypatch):
         def mock_get(*args, **kwargs):
-            return MockGetLoanResponse()
+            #return MockGetLoanResponse()
+            return {"data": [{'username': 'ken45',
+                 'loanID': 1001,
+                 'loanType': 'VL', 'loanAmount': 20000}]}
 
         customer = customer_service.Customer(1001)
         monkeypatch.setattr(customer.mongo_repository, "get_record", mock_get)
         return customer
 
     @pytest.fixture
-    def return_valid_accountnumber_response(self, monkeypatch):
-        customer = customer_service.Customer()
-        monkeypatch.setattr(customer.mongo_repository, "get_document_number")
-        return 1000
-
-    @pytest.fixture
-    def return_valid_addcustomer_response(self, monkeypatch):
+    def return_empty_response_loan(self, monkeypatch):
         def mock_get(*args, **kwargs):
-            return MockMongoInsertResponse()
+            return {"data": []}
 
-        customer = customer_service.Customer()
-        monkeypatch.setattr(customer.mongo_repository, "add_record", mock_get)
+        customer = customer_service.Customer(1001)
+        monkeypatch.setattr(customer.mongo_repository, "get_record", mock_get)
         return customer
 
-    def test_add_customer(self):
-        customer = self.return_valid_response.get_customer_details('username', self.request_data["username"])
-        if customer and customer.get('data') == []:
-            self.request_data["accountNumber"] = self.return_valid_accountnumber_response.get_document_number(
-                'accountNumber')
-            self.request_data["password"] = generate_password_hash(self.request_data["password"])
-            _id = self.return_valid_addcustomer_response.add_record(self.request_data)
+    def test_add_customer(self, return_valid_response):
+        app = Flask(__name__)
+        with app.app_context():
+            customer = return_valid_response.get_customer_details('username', 'testuser')
+            if customer and customer.get('data') == []:
+                return_valid_response.request_data = {
+                    "username": "testuser",
+                    "password": "Blue1234",
+                    "name": "John Doe",
+                    "accountType": "savings",
+                    "address": "1 Main Street",
+                    "state": "Test",
+                    "pan": "aaaaa5678a",
+                    "contactNo": "9037843092",
+                    "dob": "10-18-2020",
+                    "country": "India",
+                    "emailAddress": "test@tt.co"
+                }
+                _id = return_valid_response.add_customer()
 
     def test_get_customer_details_success_account_number(self, return_valid_response):
         response = return_valid_response.get_customer_details('accountNumber', 1001)
@@ -142,22 +169,20 @@ class TestCustomerService:
         app = Flask(__name__)
         with app.app_context():
             customer = customer_service.Customer(1001)
-            response = customer.get_customer_details('accountNumber', 1002, True)
+            response = customer.get_customer_details('accountNumber', None, True)
             assert response.json['message'] == 'Invalid search condition'
 
     def test_get_loan_details_success_account_number(self, return_valid_loan_response):
-        response = return_valid_loan_response.get_loan_details('loanID', 1001)
-        assert response is not None
-
-    def test_get_loan_details_without_results(self, return_empty_response):
         app = Flask(__name__)
         with app.app_context():
-            response = return_empty_response.get_loan_details('loanID', 2020, True)
-            assert response.json['message'] == 'No records found'
+            response = return_valid_loan_response.get_loan_details(1001)
+            assert response is not None
 
-    def test_get_loan_details_without_results_without_message(self, return_empty_response):
-        response = return_empty_response.get_loan_details('loanID', 1001)
-        assert response is not None
+    def test_get_loan_details_without_results(self, return_empty_response_loan):
+        app = Flask(__name__)
+        with app.app_context():
+            response = return_empty_response_loan.get_loan_details(2020)
+            assert response.json['Info'] == 'Loan details not found'
 
     def test_login_valid_credentials_should_return_valid_jwt_token(self, return_valid_response_login):
         app = Flask(__name__)
