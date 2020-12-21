@@ -26,3 +26,10 @@ def test_customer_get_details_no_record_in_db(test_client, test_token):
     get_response = test_client.get(url_path, headers={'Authorization': test_token})
     assert get_response.status_code == 200
     assert json.loads(get_response.data)['message'] == 'No records found'
+
+def test_customer_delete_customer_success(test_client, test_token, add_customer):
+    url_path = f'/customer'
+    data = { "accountNumber": f"{add_customer}"}
+    delete_response = test_client.delete(url_path, headers={'Authorization': test_token}, json=data)
+    assert delete_response.status_code == 200
+    assert delete_response.data == b'Deleted'
