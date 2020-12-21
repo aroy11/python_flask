@@ -1,5 +1,8 @@
 import json
 
+def test_customer_login_success(test_client):
+    response = test_client.post('/login', json={ 'username' :'johndoe','password': 'Welcome'})
+    assert response.status_code == 201
 
 def test_customer_login_invalid_user_detail(test_client):
     response = test_client.post('/login', json={ 'username1' :'test01','password': 'Test0101'})
